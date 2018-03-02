@@ -62,8 +62,8 @@ class Pong
         this.ball.pos.x = 100;
         this.ball.pos.y = 50;
         
-        this.ball.vel.x = 100;
-        this.ball.vel.y = 100;
+        this.ball.vel.x = 250;
+        this.ball.vel.y = 250;
         
         this.players = [
             new Player,
@@ -88,6 +88,13 @@ class Pong
         };
         callback();
     }
+    collide(player, ball)
+    {
+        if(player.left < ball.right && player.right > ball.left && player.top < ball.bottom && player.bottom > ball.top){
+            ball.vel.x = -ball.vel.x;
+        }
+        
+    }
     draw()
     {
         this._context.fillStyle = '#000';
@@ -100,7 +107,7 @@ class Pong
     drawRect(rect)
     {
         this._context.fillStyle = '#fff';
-        this._context.fillRect(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+        this._context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
     }
     update(dt) {
         this.ball.pos.x += this.ball.vel.x * dt;
@@ -113,9 +120,18 @@ class Pong
         if (this.ball.top < 0 || this.ball.bottom > this._canvas.height){
             this.ball.vel.y = -this.ball.vel.y;
         }
+
+        this.players[1].pos.y = this.ball.pos.y;  
+
+        this.players.forEach(player => this.collide(player, this.ball));
+
         this.draw();
+
     }
 }
 const canvas = document.getElementById('pong');
 const pong = new Pong(canvas);
 
+canvas.addEventListener('mousemove', event => {
+    pong.players[0].pos.y = event.offsetY;
+});
